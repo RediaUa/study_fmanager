@@ -1,11 +1,13 @@
 <?php
-    define('DS', '/');
-    require_once "Classes/Entity.php";
-    require_once "Classes/File.php";
-    require_once "Classes/Folder.php";
 
-    $base = __DIR__;
-    $list = scandir($base);
+define('DS', '/');
+
+$loader = require_once 'Classes/Autoloader.php';
+$loader->addNamspacePath('Mindk', __DIR__ . '/Classes/');
+
+$base = !empty( $_GET['entry'] ) ? urldecode($_GET['entry']) :  __DIR__;
+$entryFolder = new \Mindk\Folder($base);
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -16,19 +18,10 @@
 </head>
 <body>
 <div class="uk-container uk-container-center uk-margin-large-top">
-<?php foreach ($list as $item):?>
-    <div><?php
-        $fullPath = $base . DS . $item;
-        $obj = is_file($fullPath)
-            ? new File($fullPath)
-            : new Folder($fullPath);
-
-        if($obj instanceof Entity){
-            $obj->showTeaser();
-        }
-        ?>
-    </div>
-<?php endforeach; ?>
+    <?php if( $base != __DIR__ ): ?>
+    <a href="index.php?entry=<?php echo urlencode(dirname($base)); ?>"><i class="uk-icon-mail-reply-all"></i> ..</a>
+    <?php endif; ?>
+    <?php $entryFolder->showContent(); ?>
 </div>
 </body>
 </html>
